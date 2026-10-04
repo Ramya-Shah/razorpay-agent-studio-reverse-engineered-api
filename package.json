@@ -1,0 +1,26 @@
+{
+  "name": "razorpay-agent-studio-reverse-engineered-api",
+  "version": "0.1.0",
+  "description": "Typed client and API over NPCI's public UPI ecosystem statistics (no official API exists)",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:live": "vitest run test/live.test.ts",
+    "serve": "tsx src/server.ts",
+    "record-fixtures": "tsx scripts/record-fixtures.ts"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
