@@ -23,9 +23,19 @@ describe("MCP tool spec", () => {
     }
   });
 
-  it("exposes exactly the six documented tools", () => {
+  it("exposes exactly the documented tools", () => {
     expect(spec.tools.map((t) => t.name).sort()).toEqual(
-      ["compare_banks", "get_bank_stats", "get_uptime", "list_banks", "monthly_trend", "worst_banks_by_td"],
+      [
+        "compare_banks",
+        "get_autopay_bank_stats",
+        "get_bank_stats",
+        "get_uptime",
+        "list_banks",
+        "monthly_trend",
+        "recommend_retry",
+        "worst_autopay_banks_by_td",
+        "worst_banks_by_td",
+      ],
     );
   });
 });

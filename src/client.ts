@@ -2,8 +2,8 @@ import path from "node:path";
 import { DiskCache } from "./cache.js";
 import { StructureChangedError, UpstreamError, ValidationError } from "./errors.js";
 import { type Fetcher, defaultFetcher, withRetries } from "./http.js";
-import { parseBankTable, parseUptime } from "./parse.js";
-import type { BankSide, BankStats, UptimeRecord } from "./types.js";
+import { parseAutopayTable, parseBankTable, parseUptime } from "./parse.js";
+import type { AutopayKind, AutopayStats, BankSide, BankStats, UptimeRecord } from "./types.js";
 
 const BASE = "https://www.npci.org.in/api";
 const ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -29,6 +29,12 @@ export function parseMonth(month: string): { year: number; index: number } {
   const m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(month);
   if (!m) throw new ValidationError(`Invalid month "${month}". Use YYYY-MM, e.g. 2026-08.`);
   return { year: Number(m[1]), index: Number(m[2]) - 1 };
+}
+
+export function addMonths(month: string, delta: number): string {
+  const { year, index } = parseMonth(month);
+  const total = year * 12 + index + delta;
+  return `${Math.floor(total / 12)}-${String((total % 12) + 1).padStart(2, "0")}`;
 }
 
 export class NpciClient {
@@ -65,6 +71,15 @@ export class NpciClient {
       `&type_name=${side}&year=${year}&month=${ABBR[index]}&page_no=1&sort_by=asc&size=50&locale=en`;
     const body = await this.getJson(url);
     return parseBankTable(body, side, month);
+  }
+
+  async getAutopayTable(kind: AutopayKind, month: string): Promise<AutopayStats[]> {
+    const { year, index } = parseMonth(month);
+    const type = kind === "execution" ? "execution" : "reg";
+    const url =
+      `${BASE}/ecosystem-statistics/get-statistics?product_name=Autopay&tab_name=top50-remitter` +
+      `&type_name=${type}&year=${year}&month=${ABBR[index]}&page_no=1&sort_by=asc&size=50&locale=en`;
+    return parseAutopayTable(await this.getJson(url), kind, month);
   }
 
   async getUptime(month: string): Promise<UptimeRecord> {

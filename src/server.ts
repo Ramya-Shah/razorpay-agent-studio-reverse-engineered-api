@@ -44,6 +44,23 @@ export function buildServer(service: UpiStatsService): FastifyInstance {
     const q = req.query as Query;
     return service.monthlyTrend(need(q, "bank"), need(q, "metric"), list(need(q, "months")), q.side);
   });
+  app.get("/autopay/bank-stats", async (req) => {
+    const q = req.query as Query;
+    return service.getAutopayBankStats(need(q, "bank"), need(q, "month"), q.kind);
+  });
+  app.get("/autopay/worst-by-td", async (req) => {
+    const q = req.query as Query;
+    return service.worstAutopayBanksByTd(need(q, "month"), q.n === undefined ? 5 : Number(q.n), q.kind);
+  });
+  app.get("/retry-advice", async (req) => {
+    const q = req.query as Query;
+    return service.recommendRetry(
+      need(q, "bank"),
+      need(q, "month"),
+      need(q, "failure_type"),
+      q.lookback_months === undefined ? 1 : Number(q.lookback_months),
+    );
+  });
   app.get("/uptime", async (req) => service.getUptime(need(req.query as Query, "month")));
 
   return app;

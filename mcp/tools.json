@@ -8,10 +8,24 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$", "description": "YYYY-MM. NPCI usually publishes the previous month around month-end; the latest month may be missing." },
-          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter", "description": "remitter = payer's bank (the bank that debits)." }
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+            "description": "YYYY-MM. NPCI usually publishes the previous month around month-end; the latest month may be missing."
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "remitter",
+              "beneficiary"
+            ],
+            "default": "remitter",
+            "description": "remitter = payer's bank (the bank that debits)."
+          }
         },
-        "required": ["month"],
+        "required": [
+          "month"
+        ],
         "additionalProperties": false
       }
     },
@@ -21,11 +35,28 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "bank": { "type": "string", "minLength": 1, "description": "Bank name or unique fragment, case-insensitive. Ambiguous names return an error listing the matches." },
-          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
-          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+          "bank": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Bank name or unique fragment, case-insensitive. Ambiguous names return an error listing the matches."
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "remitter",
+              "beneficiary"
+            ],
+            "default": "remitter"
+          }
         },
-        "required": ["bank", "month"],
+        "required": [
+          "bank",
+          "month"
+        ],
         "additionalProperties": false
       }
     },
@@ -35,11 +66,31 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "banks": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 10 },
-          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
-          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+          "banks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2,
+            "maxItems": 10
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "remitter",
+              "beneficiary"
+            ],
+            "default": "remitter"
+          }
         },
-        "required": ["banks", "month"],
+        "required": [
+          "banks",
+          "month"
+        ],
         "additionalProperties": false
       }
     },
@@ -49,11 +100,28 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
-          "n": { "type": "integer", "minimum": 1, "maximum": 50, "default": 5 },
-          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          },
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 5
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "remitter",
+              "beneficiary"
+            ],
+            "default": "remitter"
+          }
         },
-        "required": ["month"],
+        "required": [
+          "month"
+        ],
         "additionalProperties": false
       }
     },
@@ -63,12 +131,43 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "bank": { "type": "string", "minLength": 1 },
-          "metric": { "type": "string", "enum": ["approvedPct", "bdPct", "tdPct", "volumeMn", "debitReversalSuccessPct"] },
-          "months": { "type": "array", "items": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" }, "minItems": 2, "maxItems": 12 },
-          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+          "bank": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metric": {
+            "type": "string",
+            "enum": [
+              "approvedPct",
+              "bdPct",
+              "tdPct",
+              "volumeMn",
+              "debitReversalSuccessPct"
+            ]
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+            },
+            "minItems": 2,
+            "maxItems": 12
+          },
+          "side": {
+            "type": "string",
+            "enum": [
+              "remitter",
+              "beneficiary"
+            ],
+            "default": "remitter"
+          }
         },
-        "required": ["bank", "metric", "months"],
+        "required": [
+          "bank",
+          "metric",
+          "months"
+        ],
         "additionalProperties": false
       }
     },
@@ -78,9 +177,114 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" }
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          }
         },
-        "required": ["month"],
+        "required": [
+          "month"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_autopay_bank_stats",
+      "description": "NPCI AutoPay (mandate) statistics for one remitter bank: approved %, business-decline % and technical-decline %. kind=execution covers recurring debits (the retry-relevant table); kind=registration covers mandate set-up. NPCI does not state the unit of volume.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bank": {
+            "type": "string",
+            "minLength": 1
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "execution",
+              "registration"
+            ],
+            "default": "execution"
+          }
+        },
+        "required": [
+          "bank",
+          "month"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "worst_autopay_banks_by_td",
+      "description": "The n AutoPay remitter banks with the highest technical-decline rate in a month.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          },
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 5
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "execution",
+              "registration"
+            ],
+            "default": "execution"
+          }
+        },
+        "required": [
+          "month"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "recommend_retry",
+      "description": "Bank-level retry guidance after a failed UPI AutoPay debit: action, retry window in hours, attempt cap, whether to nudge the customer, plus the reasoning and caveats. Pass failure_type from the transaction's own gateway error code (technical = system-side, business = customer-side, unknown if unclassified). Uses monthly data, so it cannot tell whether the bank is down right now. It adjusts a default retry policy and does not diagnose a payment.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bank": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The payer (remitter) bank."
+          },
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+          },
+          "failure_type": {
+            "type": "string",
+            "enum": [
+              "technical",
+              "business",
+              "unknown"
+            ]
+          },
+          "lookback_months": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6,
+            "default": 1,
+            "description": "Months to check for chronic unreliability. Each extra month may cost one cached request to NPCI."
+          }
+        },
+        "required": [
+          "bank",
+          "month",
+          "failure_type"
+        ],
         "additionalProperties": false
       }
     }

@@ -11,6 +11,8 @@ const ROUTES: Record<string, string> = {
   "remitter:Aug:2026": "top50-remitter-2026-08",
   "beneficiary:Aug:2026": "top50-beneficiary-2026-08",
   "remitter:Sep:2026": "top50-remitter-2026-09-nodata",
+  "autopay:execution:Aug:2026": "autopay-execution-2026-08",
+  "autopay:reg:Aug:2026": "autopay-reg-2026-08",
   "uptime:July:2026": "uptime-2026-07",
   "uptime:August:2026": "uptime-2026-08-nodata",
 };
@@ -18,8 +20,9 @@ const ROUTES: Record<string, string> = {
 export function routeKey(url: string): string {
   const u = new URL(url);
   const p = u.searchParams;
+  const prefix = p.get("product_name") === "Autopay" ? "autopay:" : "";
   return u.pathname.includes("get-statistics")
-    ? `${p.get("type_name")}:${p.get("month")}:${p.get("year")}`
+    ? `${prefix}${p.get("type_name")}:${p.get("month")}:${p.get("year")}`
     : `uptime:${p.get("month")}:${p.get("year")}`;
 }
 

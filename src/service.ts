@@ -1,7 +1,8 @@
+import { buildRetryAdvice, insufficientData } from "./advice.js";
 import type { NpciClient } from "./client.js";
-import { parseMonth } from "./client.js";
+import { addMonths, parseMonth } from "./client.js";
 import { NotFoundError, ValidationError } from "./errors.js";
-import type { BankSide, BankStats, TrendMetric, UptimeRecord } from "./types.js";
+import type { AutopayKind, AutopayStats, BankSide, BankStats, FailureType, RetryAdvice, TrendMetric, UptimeRecord } from "./types.js";
 
 const SIDES: BankSide[] = ["remitter", "beneficiary"];
 const METRICS: TrendMetric[] = ["approvedPct", "bdPct", "tdPct", "volumeMn", "debitReversalSuccessPct"];
@@ -11,9 +12,17 @@ function checkSide(side: string): BankSide {
   return side as BankSide;
 }
 
+const KINDS: AutopayKind[] = ["execution", "registration"];
+const FAILURE_TYPES: FailureType[] = ["technical", "business", "unknown"];
+
+function checkKind(kind: string): AutopayKind {
+  if (!KINDS.includes(kind as AutopayKind)) throw new ValidationError(`kind must be one of: ${KINDS.join(", ")}`);
+  return kind as AutopayKind;
+}
+
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
-function findBank(table: BankStats[], query: string): BankStats {
+function findBank<T extends { bank: string; month: string }>(table: T[], query: string): T {
   const q = norm(query);
   if (!q) throw new ValidationError("bank must not be empty");
   const exact = table.filter((b) => norm(b.bank) === q);
@@ -86,5 +95,42 @@ export class UpiStatsService {
 
   getUptime(month: string): Promise<UptimeRecord> {
     return this.client.getUptime(month);
+  }
+
+  async getAutopayBankStats(bank: string, month: string, kind: string = "execution"): Promise<AutopayStats> {
+    return findBank(await this.client.getAutopayTable(checkKind(kind), month), bank);
+  }
+
+  async worstAutopayBanksByTd(month: string, n = 5, kind: string = "execution"): Promise<AutopayStats[]> {
+    if (!Number.isInteger(n) || n < 1 || n > 50) throw new ValidationError("n must be an integer between 1 and 50");
+    const table = await this.client.getAutopayTable(checkKind(kind), month);
+    return [...table].sort((a, b) => b.tdPct - a.tdPct || b.volume - a.volume).slice(0, n);
+  }
+
+  async recommendRetry(bank: string, month: string, failureType: string, lookbackMonths = 1): Promise<RetryAdvice> {
+    if (!FAILURE_TYPES.includes(failureType as FailureType)) {
+      throw new ValidationError(`failureType must be one of: ${FAILURE_TYPES.join(", ")}`);
+    }
+    if (!Number.isInteger(lookbackMonths) || lookbackMonths < 1 || lookbackMonths > 6) {
+      throw new ValidationError("lookbackMonths must be an integer between 1 and 6");
+    }
+    const ft = failureType as FailureType;
+    const table = await this.client.getAutopayTable("execution", month);
+    let row: AutopayStats;
+    try {
+      row = findBank(table, bank);
+    } catch (err) {
+      if (err instanceof NotFoundError) return insufficientData(bank.trim(), month, ft);
+      throw err;
+    }
+    const earlierTables: AutopayStats[][] = [];
+    for (let i = 1; i < lookbackMonths; i++) {
+      try {
+        earlierTables.push(await this.client.getAutopayTable("execution", addMonths(month, -i)));
+      } catch (err) {
+        if (!(err instanceof NotFoundError)) throw err;
+      }
+    }
+    return buildRetryAdvice({ bank: row.bank, month, failureType: ft, table, earlierTables });
   }
 }

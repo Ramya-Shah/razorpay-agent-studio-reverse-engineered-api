@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { NotFoundError, StructureChangedError } from "./errors.js";
-import type { BankSide, BankStats, UptimeRecord } from "./types.js";
+import type { AutopayKind, AutopayStats, BankSide, BankStats, UptimeRecord } from "./types.js";
 
 const Header = z.object({ header_key: z.string(), header_name: z.string().optional() }).passthrough();
 
@@ -120,4 +120,29 @@ export function parseUptime(body: unknown, month: string): UptimeRecord {
     unscheduledDowntimeMins: nilToZero(row.unscheduled_downtime, "unscheduled_downtime", what),
     incidents: nilToZero(row.no_of_incidents, "no_of_incidents", what),
   };
+}
+
+const AUTOPAY_REQUIRED = ["remitter_bank", "total_volume", "approved_percent", "bd_percent", "td_percent"];
+
+export function parseAutopayTable(body: unknown, kind: AutopayKind, month: string): AutopayStats[] {
+  const what = `autopay ${kind} table ${month}`;
+  const parsed = TableData.safeParse(unwrap(body, what));
+  if (!parsed.success) throw new StructureChangedError(`${what}: table headers or results missing`);
+  const { table_headers, results } = parsed.data;
+  requireKeys(table_headers.headers, AUTOPAY_REQUIRED, what);
+  if (results.length === 0) throw new NotFoundError(`${what}: table is empty`);
+  return results.map((row, i) => {
+    const name = row.remitter_bank;
+    if (typeof name !== "string" || !name.trim()) throw new StructureChangedError(`${what}: row ${i + 1} has no bank name`);
+    return {
+      bank: name.trim(),
+      month,
+      kind,
+      rank: i + 1,
+      volume: num(row.total_volume, "total_volume", what),
+      approvedPct: num(row.approved_percent, "approved_percent", what),
+      bdPct: num(row.bd_percent, "bd_percent", what),
+      tdPct: num(row.td_percent, "td_percent", what),
+    };
+  });
 }
