@@ -1,0 +1,88 @@
+{
+  "server": "npci-upi-bank-stats",
+  "description": "Read-only, bank-level UPI reliability context from NPCI's public monthly statistics. Monthly data: it cannot say a bank is down right now, and it is not a per-transaction diagnosis. Use the transaction's own gateway error code first.",
+  "tools": [
+    {
+      "name": "list_banks",
+      "description": "List the banks in NPCI's monthly top-50 table. Use to resolve a bank name before other calls.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$", "description": "YYYY-MM. NPCI usually publishes the previous month around month-end; the latest month may be missing." },
+          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter", "description": "remitter = payer's bank (the bank that debits)." }
+        },
+        "required": ["month"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_bank_stats",
+      "description": "Approved %, business-decline %, technical-decline % and debit-reversal success for one bank in one month. For a failed AutoPay debit use side=remitter (the payer's bank).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bank": { "type": "string", "minLength": 1, "description": "Bank name or unique fragment, case-insensitive. Ambiguous names return an error listing the matches." },
+          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
+          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+        },
+        "required": ["bank", "month"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "compare_banks",
+      "description": "Side-by-side stats for 2 to 10 banks in one month.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "banks": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 10 },
+          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
+          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+        },
+        "required": ["banks", "month"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "worst_banks_by_td",
+      "description": "The n banks with the highest technical-decline rate in a month (bank or NPCI system problems, as opposed to customer-side business declines).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" },
+          "n": { "type": "integer", "minimum": 1, "maximum": 50, "default": 5 },
+          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+        },
+        "required": ["month"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "monthly_trend",
+      "description": "One metric for one bank across 2 to 12 months. Months NPCI has not published come back as null.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bank": { "type": "string", "minLength": 1 },
+          "metric": { "type": "string", "enum": ["approvedPct", "bdPct", "tdPct", "volumeMn", "debitReversalSuccessPct"] },
+          "months": { "type": "array", "items": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" }, "minItems": 2, "maxItems": 12 },
+          "side": { "type": "string", "enum": ["remitter", "beneficiary"], "default": "remitter" }
+        },
+        "required": ["bank", "metric", "months"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_uptime",
+      "description": "NPCI's own monthly UPI uptime %, unscheduled downtime minutes and incident count. Published with an irregular lag: recent months are often missing (NotFound).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" }
+        },
+        "required": ["month"],
+        "additionalProperties": false
+      }
+    }
+  ]
+}
