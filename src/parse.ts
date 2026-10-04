@@ -85,8 +85,12 @@ export function parseBankTable(body: unknown, side: BankSide, month: string): Ba
       tdPct: num(row.td_percent, "td_percent", what),
     };
     if (side === "remitter") {
-      stats.debitReversalCountMn = num(row.total_debit_reversal_count_in_mn, "total_debit_reversal_count_in_mn", what);
-      stats.debitReversalSuccessPct = num(row.debit_reversal_success_percent, "debit_reversal_success_percent", what);
+      // NPCI prints "-" for banks with no debit reversals; the 0.00% success rate beside it is not meaningful.
+      const rawCount = row.total_debit_reversal_count_in_mn;
+      if (!(typeof rawCount === "string" && /^[-–—]$/.test(rawCount.trim()))) {
+        stats.debitReversalCountMn = num(rawCount, "total_debit_reversal_count_in_mn", what);
+        stats.debitReversalSuccessPct = num(row.debit_reversal_success_percent, "debit_reversal_success_percent", what);
+      }
       stats.udirAutoUpdateSrPct = optNum(row.udir_auto_update_sr_percent);
       stats.udirRefundSrPct = optNum(row.udir_refund_sr_percent);
     } else {

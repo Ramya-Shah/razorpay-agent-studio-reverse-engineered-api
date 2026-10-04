@@ -10,7 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:live": "vitest run test/live.test.ts",
-    "serve": "tsx src/server.ts",
+    "serve": "tsx src/main.ts",
     "record-fixtures": "tsx scripts/record-fixtures.ts"
   },
   "dependencies": {
