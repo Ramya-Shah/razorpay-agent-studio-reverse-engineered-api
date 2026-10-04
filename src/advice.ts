@@ -104,7 +104,7 @@ export function buildRetryAdvice({ bank, month, failureType, table, earlierTable
   }
 
   if (lowVolume) caveats.push("This bank is in the lowest quartile by volume in the table, so its rates come from a small sample and are noisy.");
-  if (chronic === null) caveats.push("Only one month was checked, so chronic unreliability could not be assessed. Pass lookbackMonths > 1.");
+  if (chronic === null) caveats.push("Only one month was checked, so chronic unreliability could not be assessed. Pass lookback_months > 1.");
   caveats.push("NPCI does not state the unit of AutoPay volume in its table.");
 
   return {
