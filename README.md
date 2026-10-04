@@ -56,7 +56,10 @@ $env:NPCI_LIVE="1"; $env:NPCI_CONTACT="you@example.com"; npm run test:live
 Run the HTTP API:
 
 ```bash
+# bash
 NPCI_CONTACT=you@example.com npm run serve     # http://127.0.0.1:3000
+# PowerShell
+$env:NPCI_CONTACT="you@example.com"; npm run serve
 curl "http://127.0.0.1:3000/bank-stats?bank=State%20Bank%20of%20India&month=2026-08"
 ```
 
@@ -101,7 +104,8 @@ Only public aggregate statistics are used. There are no credentials, logins or c
 
 - "Top 50" tables are the right coverage for the banks that matter to a merchant's payers.
 - Technical declines (TD) are the retry-relevant signal; business declines (BD) are customer-side and are not fixed by retrying.
-- The undocumented endpoints behave as observed on 2026-10-04.
+- The undocumented endpoints behave as observed on 2026-10-04. On that date the live smoke test passed (1 request), and the running server returned `/retry-advice` for Karnataka Grameena Bank with figures matching the recorded fixture.
+- NPCI's CDN rejected some User-Agent strings during development (a GitHub-handle contact was denied; an email contact was accepted), which is why `NPCI_CONTACT` should be an email.
 
 ## Not done
 
