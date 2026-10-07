@@ -15,6 +15,7 @@ const ROUTES: Record<string, string> = {
   "autopay:reg:Aug:2026": "autopay-reg-2026-08",
   "uptime:July:2026": "uptime-2026-07",
   "uptime:August:2026": "uptime-2026-08-nodata",
+  "uptime:September:2026": "uptime-2026-09",
 };
 
 export function routeKey(url: string): string {

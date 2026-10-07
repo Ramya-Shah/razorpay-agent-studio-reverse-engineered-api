@@ -173,7 +173,7 @@
     },
     {
       "name": "get_uptime",
-      "description": "NPCI's own monthly UPI uptime %, unscheduled downtime minutes and incident count. Published with an irregular lag: recent months are often missing (NotFound).",
+      "description": "NPCI's own monthly UPI uptime % (including scheduled downtime), unscheduled downtime minutes and incident count. Published with an irregular lag: recent months are often missing (NotFound).",
       "inputSchema": {
         "type": "object",
         "properties": {

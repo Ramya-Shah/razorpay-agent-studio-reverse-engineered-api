@@ -57,6 +57,15 @@ describe("normal results", () => {
     ]);
   });
 
+  it("uptime can be below 100% with no unscheduled downtime (scheduled downtime counts)", async () => {
+    expect(await svc().getUptime("2026-09")).toEqual({
+      month: "2026-09",
+      uptimePct: 99.9907,
+      unscheduledDowntimeMins: 0,
+      incidents: 0,
+    });
+  });
+
   it("get_uptime reads NIL downtime as zero", async () => {
     expect(await svc().getUptime("2026-07")).toEqual({
       month: "2026-07",
